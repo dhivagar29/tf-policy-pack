@@ -91,6 +91,8 @@ docs/            sample Conftest output + playground screenshot
 - New buckets have had public access blocked by default since April 2023, so `TF-S3-003` means "make the block explicit in the plan".
 - Not a replacement for AWS Config, SCP, or provider-side defaults (S3 Block Public Access account settings, etc.).
 - Playground is for demos and local review; CI should run Conftest/OPA on real plan JSON.
+- Bucket matching also requires the same `module_address`, so a public access block or SSE config in one module that names a bucket in another module by literal name still raises TF-S3-003 / TF-ENC-001. This errs on the safe side (false positive, nothing missed).
+
 
 ## License
 
