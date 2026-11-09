@@ -1,0 +1,5 @@
+{
+  "required_tags": {
+    "keys": ["Owner", "Environment", "CostCenter"]
+  }
+}

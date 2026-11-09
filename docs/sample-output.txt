@@ -1,0 +1,32 @@
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_db_instance.main: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_ebs_volume.plain: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_ebs_volume.plain: Missing required tag "Environment"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_instance.web: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_instance.web: Missing required tag "Environment"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_instance.web: Missing required tag "Owner"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.public: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.public: Missing required tag "Environment"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.public: Missing required tag "Owner"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.untagged: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.untagged: Missing required tag "Environment"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_s3_bucket.untagged: Missing required tag "Owner"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_security_group.wide_open: Missing required tag "CostCenter"
+WARN - fixtures/plan_bad.json - main - [TF-TAG-001] (low) aws_security_group.wide_open: Missing required tag "Owner"
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-001] (high) aws_s3_bucket.public: S3 bucket has no server-side encryption configuration in this plan
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-001] (high) aws_s3_bucket.untagged: S3 bucket has no server-side encryption configuration in this plan
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-002] (high) aws_ebs_volume.plain: EBS volume is not encrypted
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-002] (high) aws_instance.web: EC2 ebs_block_device /dev/sdf is not encrypted
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-002] (high) aws_instance.web: EC2 root_block_device is not encrypted
+FAIL - fixtures/plan_bad.json - main - [TF-ENC-003] (high) aws_db_instance.main: RDS storage_encrypted is not true
+FAIL - fixtures/plan_bad.json - main - [TF-S3-001] (high) aws_s3_bucket.public: S3 bucket ACL "public-read" grants public access
+FAIL - fixtures/plan_bad.json - main - [TF-S3-002] (high) aws_s3_bucket_acl.public: S3 bucket ACL resource uses "public-read-write"
+FAIL - fixtures/plan_bad.json - main - [TF-S3-003] (high) aws_s3_bucket.public: S3 bucket has no aws_s3_bucket_public_access_block in this plan
+FAIL - fixtures/plan_bad.json - main - [TF-S3-003] (high) aws_s3_bucket.untagged: S3 bucket has no aws_s3_bucket_public_access_block in this plan
+FAIL - fixtures/plan_bad.json - main - [TF-S3-004] (high) aws_s3_bucket_public_access_block.weak: block_public_acls is disabled
+FAIL - fixtures/plan_bad.json - main - [TF-S3-004] (high) aws_s3_bucket_public_access_block.weak: ignore_public_acls is disabled
+FAIL - fixtures/plan_bad.json - main - [TF-SG-001] (high) aws_security_group.wide_open: Security group ingress opens ports 0-65535/tcp to the world
+FAIL - fixtures/plan_bad.json - main - [TF-SG-001] (high) aws_security_group.wide_open: Security group ingress opens ports 22-22/tcp to the world
+FAIL - fixtures/plan_bad.json - main - [TF-SG-002] (high) aws_security_group_rule.db_open: Security group rule opens ports 5432-5432/tcp to the world
+FAIL - fixtures/plan_bad.json - main - [TF-SG-002] (high) aws_vpc_security_group_ingress_rule.rdp: Security group rule opens ports 3389-3389/tcp to the world
+
+30 tests, 0 passed, 14 warnings, 16 failures, 0 exceptions

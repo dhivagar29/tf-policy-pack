@@ -1,0 +1,249 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.public",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-public-logs",
+          "acl": "public-read",
+          "tags": {
+            "Name": "public"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_acl.public",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-public-logs",
+          "acl": "public-read-write"
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.weak",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "weak",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "other-bucket",
+          "block_public_acls": false,
+          "block_public_policy": true,
+          "ignore_public_acls": false,
+          "restrict_public_buckets": true
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_security_group.wide_open",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "wide_open",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "wide-open",
+          "ingress": [
+            {
+              "from_port": 22,
+              "to_port": 22,
+              "protocol": "tcp",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": []
+            },
+            {
+              "from_port": 0,
+              "to_port": 65535,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [
+                "::/0"
+              ]
+            }
+          ],
+          "egress": [],
+          "tags": {
+            "Environment": "dev"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_security_group_rule.db_open",
+      "mode": "managed",
+      "type": "aws_security_group_rule",
+      "name": "db_open",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "type": "ingress",
+          "from_port": 5432,
+          "to_port": 5432,
+          "protocol": "tcp",
+          "cidr_blocks": [
+            "0.0.0.0/0"
+          ],
+          "security_group_id": "sg-123"
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.rdp",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "rdp",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "from_port": 3389,
+          "to_port": 3389,
+          "ip_protocol": "tcp",
+          "cidr_ipv4": "0.0.0.0/0",
+          "security_group_id": "sg-123"
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_ebs_volume.plain",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "name": "plain",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "availability_zone": "us-east-1a",
+          "size": 40,
+          "encrypted": false,
+          "tags": {
+            "Owner": "alice"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "engine": "postgres",
+          "instance_class": "db.t3.micro",
+          "storage_encrypted": false,
+          "tags": {
+            "Owner": "alice",
+            "Environment": "prod"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_instance.web",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "ami": "ami-123",
+          "instance_type": "t3.micro",
+          "root_block_device": [
+            {
+              "volume_size": 20,
+              "encrypted": false
+            }
+          ],
+          "ebs_block_device": [
+            {
+              "device_name": "/dev/sdf",
+              "volume_size": 100,
+              "encrypted": false
+            }
+          ],
+          "tags": {
+            "Name": "web"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket.untagged",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "untagged",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-untagged",
+          "tags": {}
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

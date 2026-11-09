@@ -1,0 +1,17 @@
+{
+  "name": "tf-policy-pack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OPA/Conftest Terraform plan policy pack with a client-side playground",
+  "license": "MIT",
+  "scripts": {
+    "test:opa": "opa test policy/ data/ -v",
+    "test:conftest": "conftest test fixtures/plan_bad.json -p policy --data data; test $? -eq 1",
+    "test:conftest:good": "conftest test fixtures/plan_good.json -p policy --data data",
+    "test:sync": "node scripts/sync-check.cjs",
+    "test": "npm run test:opa && npm run test:sync && npm run test:conftest:good"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

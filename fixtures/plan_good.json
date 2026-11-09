@@ -1,0 +1,185 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.secure",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "secure",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-secure-logs",
+          "tags": {
+            "Owner": "platform",
+            "Environment": "prod",
+            "CostCenter": "eng-100"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.secure",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "secure",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-secure-logs",
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_server_side_encryption_configuration.secure",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "secure",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "demo-secure-logs",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": {
+                "sse_algorithm": "aws:kms"
+              }
+            }
+          ]
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_security_group.app",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "app",
+          "ingress": [
+            {
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp",
+              "cidr_blocks": [
+                "10.0.0.0/8"
+              ],
+              "ipv6_cidr_blocks": []
+            }
+          ],
+          "egress": [],
+          "tags": {
+            "Owner": "platform",
+            "Environment": "prod",
+            "CostCenter": "eng-100"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_ebs_volume.data",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "name": "data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "availability_zone": "us-east-1a",
+          "size": 100,
+          "encrypted": true,
+          "tags": {
+            "Owner": "platform",
+            "Environment": "prod",
+            "CostCenter": "eng-100"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "engine": "postgres",
+          "instance_class": "db.t3.micro",
+          "storage_encrypted": true,
+          "tags": {
+            "Owner": "platform",
+            "Environment": "prod",
+            "CostCenter": "eng-100"
+          }
+        },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_instance.web",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "ami": "ami-123",
+          "instance_type": "t3.micro",
+          "root_block_device": [
+            {
+              "volume_size": 20,
+              "encrypted": true
+            }
+          ],
+          "ebs_block_device": [],
+          "tags": {
+            "Owner": "platform",
+            "Environment": "prod",
+            "CostCenter": "eng-100"
+          }
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'" />
+  <title>tf-policy-pack playground</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>tf-policy-pack playground</h1>
+    <p class="sub">
+      Paste a Terraform plan JSON (<code>terraform show -json</code>) and evaluate the bundled rules entirely in your browser.
+      Client-side only: no network calls, no analytics, no cookies, and no localStorage.
+    </p>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <h2>Plan JSON</h2>
+      <textarea id="plan" spellcheck="false" placeholder='{ "format_version": "1.2", "resource_changes": [ ... ] }'></textarea>
+      <div class="toolbar">
+        <button type="button" class="primary" id="evaluate">Evaluate</button>
+        <button type="button" id="load-sample">Load sample</button>
+        <button type="button" id="clear">Clear</button>
+      </div>
+      <p class="meta" id="status"></p>
+    </section>
+    <section class="panel">
+      <h2>Findings</h2>
+      <div id="results"></div>
+    </section>
+  </main>
+  <footer>
+    Rules mirror the Rego policies in <code>policy/</code>. The JavaScript engine is checked against
+    <code>opa eval</code> on the same fixtures via <code>scripts/sync-check.cjs</code>.
+    This page is static and is not deployed by this repository.
+  </footer>
+  <script src="policy.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
