@@ -111,14 +111,20 @@ good_enc := {
 
 test_encryption_missing_denied if {
 	denies := data.main.deny with input as bad_enc
-	ids := {d.id | some d in denies}
-	"TF-ENC-001" in ids
-	"TF-ENC-002" in ids
-	"TF-ENC-003" in ids
+	warns := data.main.warn with input as bad_enc
+	deny_ids := {d.id | some d in denies}
+	warn_ids := {w.id | some w in warns}
+	"TF-ENC-001" in warn_ids
+	"TF-ENC-002" in deny_ids
+	"TF-ENC-003" in deny_ids
+	not "TF-ENC-001" in deny_ids
 }
 
 test_encryption_ok if {
 	denies := data.main.deny with input as good_enc
-	enc_ids := {d.id | some d in denies; startswith(d.id, "TF-ENC-")}
-	count(enc_ids) == 0
+	warns := data.main.warn with input as good_enc
+	enc_deny := {d.id | some d in denies; startswith(d.id, "TF-ENC-")}
+	enc_warn := {w.id | some w in warns; startswith(w.id, "TF-ENC-")}
+	count(enc_deny) == 0
+	count(enc_warn) == 0
 }

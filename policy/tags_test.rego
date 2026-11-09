@@ -49,15 +49,37 @@ tagged := {
 	],
 }
 
+# Provider default_tags land in tags_all even when resource tags = {}
+default_tagged := {
+	"resource_changes": [
+		{
+			"address": "aws_s3_bucket.defaulted",
+			"mode": "managed",
+			"type": "aws_s3_bucket",
+			"name": "defaulted",
+			"change": {"actions": ["create"], "before": null, "after": {
+				"bucket": "defaulted",
+				"tags": {},
+				"tags_all": {"Owner": "platform", "Environment": "prod", "CostCenter": "eng-100"},
+			}},
+		},
+	],
+}
+
 test_missing_tags_warn if {
 	warns := data.main.warn with input as untagged with data.required_tags as {"keys": ["Owner", "Environment", "CostCenter"]}
-	ids := {w.id | some w in warns}
-	"TF-TAG-001" in ids
-	count(warns) == 3
+	tag_warns := {w | some w in warns; w.id == "TF-TAG-001"}
+	count(tag_warns) == 3
 }
 
 test_tags_present_no_warn if {
 	warns := data.main.warn with input as tagged with data.required_tags as {"keys": ["Owner", "Environment", "CostCenter"]}
+	tag_warns := {w.id | some w in warns; w.id == "TF-TAG-001"}
+	count(tag_warns) == 0
+}
+
+test_tags_all_default_tags_no_warn if {
+	warns := data.main.warn with input as default_tagged with data.required_tags as {"keys": ["Owner", "Environment", "CostCenter"]}
 	tag_warns := {w.id | some w in warns; w.id == "TF-TAG-001"}
 	count(tag_warns) == 0
 }

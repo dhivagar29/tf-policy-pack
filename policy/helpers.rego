@@ -12,12 +12,21 @@ resource_changes contains rc if {
 
 after(rc) := rc.change.after
 
+# Prefer tags_all (includes provider default_tags). Fall back to tags only when
+# tags_all is missing, null, or not an object (e.g. unknown at plan time).
 tags_of(rc) := t if {
+	t := object.get(after(rc), "tags_all", null)
+	t != null
+	is_object(t)
+} else := t if {
 	t := object.get(after(rc), "tags", null)
 	t != null
-} else := t if {
-	t := object.get(after(rc), "tags_all", {})
+	is_object(t)
 } else := {}
+
+same_module(a, b) if {
+	object.get(a, "module_address", "") == object.get(b, "module_address", "")
+}
 
 is_cidr_open(cidr) if cidr == "0.0.0.0/0"
 is_cidr_open(cidr) if cidr == "::/0"

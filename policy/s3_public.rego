@@ -3,12 +3,14 @@ package main
 import data.tfpolicy.helpers as h
 import rego.v1
 
-# TF-S3-001: bucket ACL grants public read/write
+public_acls := {"public-read", "public-read-write", "authenticated-read"}
+
+# TF-S3-001: bucket ACL grants public / authenticated-read access
 deny contains msg if {
 	some rc in h.resource_changes
 	rc.type == "aws_s3_bucket"
 	acl := object.get(h.after(rc), "acl", "")
-	acl in {"public-read", "public-read-write"}
+	acl in public_acls
 	msg := h.finding(
 		"TF-S3-001",
 		"high",
@@ -17,12 +19,12 @@ deny contains msg if {
 	)
 }
 
-# TF-S3-002: aws_s3_bucket_acl with public ACL
+# TF-S3-002: aws_s3_bucket_acl with public / authenticated-read ACL
 deny contains msg if {
 	some rc in h.resource_changes
 	rc.type == "aws_s3_bucket_acl"
 	acl := object.get(h.after(rc), "acl", "")
-	acl in {"public-read", "public-read-write"}
+	acl in public_acls
 	msg := h.finding(
 		"TF-S3-002",
 		"high",
@@ -31,7 +33,7 @@ deny contains msg if {
 	)
 }
 
-# TF-S3-003: public_access_block missing for a planned bucket (same module address prefix)
+# TF-S3-003: public_access_block missing for a planned bucket (same module)
 deny contains msg if {
 	some rc in h.resource_changes
 	rc.type == "aws_s3_bucket"
@@ -100,7 +102,8 @@ deny contains msg if {
 bucket_has_public_access_block(bucket_rc) if {
 	some pab in h.resource_changes
 	pab.type == "aws_s3_bucket_public_access_block"
-	# Match by explicit bucket attribute equaling the bucket id/name, or shared name stem
+	h.same_module(pab, bucket_rc)
+	# Match by explicit bucket attribute equaling the bucket id/name
 	bucket_ref := object.get(h.after(pab), "bucket", "")
 	bucket_ref != ""
 	bucket_matches(bucket_rc, bucket_ref)
@@ -109,8 +112,10 @@ bucket_has_public_access_block(bucket_rc) if {
 bucket_has_public_access_block(bucket_rc) if {
 	some pab in h.resource_changes
 	pab.type == "aws_s3_bucket_public_access_block"
-	# Fallback: same Terraform resource name (common pattern: aws_s3_bucket.foo + public_access_block.foo)
+	# Fallback: same Terraform resource name within the same module
+	# (common pattern: aws_s3_bucket.foo + public_access_block.foo)
 	pab.name == bucket_rc.name
+	h.same_module(pab, bucket_rc)
 }
 
 bucket_matches(bucket_rc, ref) if {
@@ -119,10 +124,6 @@ bucket_matches(bucket_rc, ref) if {
 
 bucket_matches(bucket_rc, ref) if {
 	ref == object.get(h.after(bucket_rc), "id", "")
-}
-
-bucket_matches(bucket_rc, ref) if {
-	ref == bucket_rc.address
 }
 
 bucket_matches(bucket_rc, ref) if {

@@ -1,6 +1,6 @@
 /**
  * Faithful client-side port of the Rego policies in ../policy.
- * Kept in sync by scripts/sync-check.mjs (compares against opa eval on fixtures).
+ * Kept in sync by scripts/sync-check.cjs (compares against opa eval on fixtures).
  */
 (function (root, factory) {
   var api = factory();
@@ -16,6 +16,7 @@
 
   var SENSITIVE_PORTS = [22, 3389, 1433, 1521, 3306, 5432, 6379, 27017, 9200, 11211];
   var DEFAULT_TAGS = ["Owner", "Environment", "CostCenter"];
+  var PUBLIC_ACLS = { "public-read": 1, "public-read-write": 1, "authenticated-read": 1 };
   var TAGGABLE = {
     aws_s3_bucket: 1,
     aws_instance: 1,
@@ -57,10 +58,20 @@
     return rc.change.after;
   }
 
+  function moduleAddress(rc) {
+    return rc.module_address != null ? String(rc.module_address) : "";
+  }
+
+  function sameModule(a, b) {
+    return moduleAddress(a) === moduleAddress(b);
+  }
+
+  // Prefer tags_all (includes provider default_tags). Fall back to tags only when
+  // tags_all is missing, null, or not a plain object.
   function tagsOf(rc) {
     var a = after(rc);
-    if (a.tags && typeof a.tags === "object") return a.tags;
-    if (a.tags_all && typeof a.tags_all === "object") return a.tags_all;
+    if (a.tags_all != null && typeof a.tags_all === "object" && !Array.isArray(a.tags_all)) return a.tags_all;
+    if (a.tags != null && typeof a.tags === "object" && !Array.isArray(a.tags)) return a.tags;
     return {};
   }
 
@@ -104,18 +115,14 @@
 
   function bucketMatches(bucketRc, ref) {
     var a = after(bucketRc);
-    return (
-      ref === a.bucket ||
-      ref === a.id ||
-      ref === bucketRc.address ||
-      ref === bucketRc.type + "." + bucketRc.name
-    );
+    return ref === a.bucket || ref === a.id || ref === bucketRc.type + "." + bucketRc.name;
   }
 
   function hasPublicAccessBlock(rcs, bucketRc) {
     for (var i = 0; i < rcs.length; i++) {
       var pab = rcs[i];
       if (pab.type !== "aws_s3_bucket_public_access_block") continue;
+      if (!sameModule(pab, bucketRc)) continue;
       if (pab.name === bucketRc.name) return true;
       var ref = after(pab).bucket || "";
       if (ref && bucketMatches(bucketRc, ref)) return true;
@@ -129,9 +136,10 @@
     for (var i = 0; i < rcs.length; i++) {
       var sse = rcs[i];
       if (sse.type !== "aws_s3_bucket_server_side_encryption_configuration") continue;
+      if (!sameModule(sse, bucketRc)) continue;
       if (sse.name === bucketRc.name) return true;
       var ref = after(sse).bucket || "";
-      if (ref && (ref === a.bucket || ref === bucketRc.address)) return true;
+      if (ref && ref === a.bucket) return true;
     }
     return false;
   }
@@ -186,7 +194,7 @@
       a = after(rc);
 
       if (rc.type === "aws_s3_bucket") {
-        if (a.acl === "public-read" || a.acl === "public-read-write") {
+        if (PUBLIC_ACLS[a.acl]) {
           deny.push(finding("TF-S3-001", "high", rc.address, 'S3 bucket ACL "' + a.acl + '" grants public access'));
         }
         if (!hasPublicAccessBlock(rcs, rc)) {
@@ -195,14 +203,19 @@
           );
         }
         if (!hasSSE(rcs, rc)) {
-          deny.push(
-            finding("TF-ENC-001", "high", rc.address, "S3 bucket has no server-side encryption configuration in this plan")
+          warn.push(
+            finding(
+              "TF-ENC-001",
+              "low",
+              rc.address,
+              "S3 bucket has no explicit server-side encryption configuration in this plan (SSE-S3 is the AWS default since January 2023; declare SSE explicitly)"
+            )
           );
         }
       }
 
       if (rc.type === "aws_s3_bucket_acl") {
-        if (a.acl === "public-read" || a.acl === "public-read-write") {
+        if (PUBLIC_ACLS[a.acl]) {
           deny.push(finding("TF-S3-002", "high", rc.address, 'S3 bucket ACL resource uses "' + a.acl + '"'));
         }
       }
