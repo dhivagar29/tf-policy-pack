@@ -105,7 +105,11 @@
     try {
       plan = JSON.parse(raw);
     } catch (err) {
-      resultsEl.innerHTML = '<div class="error">Invalid JSON: ' + String(err.message || err) + "</div>";
+      resultsEl.textContent = "";
+      var errEl = document.createElement("div");
+      errEl.className = "error";
+      errEl.textContent = "Invalid JSON: " + String(err.message || err);
+      resultsEl.appendChild(errEl);
       return;
     }
     var result = window.TfPolicyPack.evaluate(plan);
