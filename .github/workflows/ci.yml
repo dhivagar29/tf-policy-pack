@@ -65,4 +65,4 @@ jobs:
       - name: Playground sync check (JS vs OPA)
         run: node scripts/sync-check.cjs
         env:
-          OPA_BIN: opa
+          OPA_BIN: /usr/local/bin/opa
